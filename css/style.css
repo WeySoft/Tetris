@@ -1,0 +1,22 @@
+:root{
+    --bg: hsl(0, 0%, 0%);
+    --text: hsl(126, 100%, 25%);
+}
+
+body{
+    color: var(--text);
+    background-color: var(--bg);
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#gameCanvas{
+    width: 60vh;
+    height: 60vh;
+}
