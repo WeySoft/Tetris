@@ -178,36 +178,35 @@ function moveDown(shape) {
         } else {
             shape.blocks.forEach(block => {
                 blocksNotActive.push(block);
-            })
+            });
+            shape.isActive = false;
+            console.log(shape);
         }
     }
 }
 
 function checkIfShapeIsNotTouchingAnotherShape(shape) {
-    var cordiantesFully = []
-    blocksNotActive.forEach(blockNotActive => {
-        cordiantesFully.push([blockNotActive.x, blockNotActive.y]);
+    shape.blocks.forEach(block => {
+        blocksNotActive.forEach(blockNotActive => {
+            if (block.x == blockNotActive.x && (block.y + 50) > blockNotActive.y) {
+                console.log('flase');
+                return false;
+            }
+        })
     });
+    return true;
 }
 
 function checkIfShapeIsNotTouchingGround(shape) {
     if (shape.blocks[0].y + 50 + speed > 700) {
-        shape.isActive = false;
-        createSqaure();
         return false;
     } else if (shape.blocks[1].y + 50 + speed > 700) {
-        shape.isActive = false;
-        createSqaure();
         return false;
     }
     else if (shape.blocks[2].y + 50 + speed > 700) {
-        shape.isActive = false;
-        createSqaure();
         return false;
     }
     else if (shape.blocks[3].y + 50 + speed > 700) {
-        shape.isActive = false;
-        createSqaure();
         return false;
     }
     else {
@@ -280,7 +279,12 @@ function clearCanvas() {
 }
 
 function runGame() {
-    moveDown(shapes.find(shape => shape.isActive === true));
+    var activeShape = shapes.find(shape => shape.isActive === true);
+    if (activeShape === null || activeShape === undefined) {
+        createLShape();
+        activeShape = shapes.find(shape => shape.isActive === true);
+    }
+    moveDown(activeShape);
     clearCanvas();
     drawBlocks();
     requestAnimationFrame(runGame);
@@ -289,5 +293,4 @@ function runGame() {
 createTShape();
 drawBlocks();
 setConrols();
-console.log(shapes)
 requestAnimationFrame(runGame)
