@@ -3,7 +3,7 @@ const ctx = canvas.getContext("2d");
 
 // Game
 const sizeBlocks = 25;
-var speed = 0.4;
+var speed = 1000;
 var points = 0;
 var shapes = [];
 var blocksNotActive = [];
@@ -15,10 +15,19 @@ function setConrols() {
         const key = event.key;
         switch (key) {
             case "ArrowDown":
-                speed = 2;
+                speed = 250;
                 break;
             case "ArrowUp":
                 rotateShape();
+                redraw();
+                break;
+            case "ArrowLeft":
+                moveLeft(activeShape);
+                redraw();
+                break;
+            case "ArrowRight":
+                moveRight(activeShape);
+                redraw();
                 break;
         }
     });
@@ -26,7 +35,7 @@ function setConrols() {
         const key = event.key;
         switch (key) {
             case "ArrowDown":
-                speed = 0.4;
+                speed = 1000;
                 break;
         }
     });
@@ -38,6 +47,33 @@ function drawBlocks() {
         ctx.fillRect(block.x, block.y, sizeBlocks, sizeBlocks)
     })
     )
+}
+
+function getRandomArbitrary(min, max) {
+    return Math.floor(Math.random() * (max - min) + min);
+}
+
+function createRandomShape() {
+    var rndInt = getRandomArbitrary(1, 6);
+    switch (rndInt) {
+        case 1:
+            createSqaure();
+            break;
+        case 2:
+            createTShape();
+            break;
+        case 3:
+            createLine();
+            break;
+        case 4:
+            createLShape();
+            break;
+        case 5:
+            createZShape();
+        default:
+            createRandomShape();
+            break;
+    }
 }
 
 function createBlock(x, y, color) {
@@ -174,9 +210,9 @@ function moveDown(shape) {
     if (shape.isActive) {
         if (checkShapeTouchingGround(shape) && checkShapeTouchAnotherShape(shape)) {
             shape.blocks.forEach(block => {
-                block.y = block.y + speed;
+                block.y = block.y + sizeBlocks;
             });
-            shape.y = shape.y + speed;
+            shape.y = shape.y + sizeBlocks;
         } else {
             shape.blocks.forEach(block => {
                 blocksNotActive.push(block);
@@ -187,12 +223,82 @@ function moveDown(shape) {
     }
 }
 
+function moveLeft(shape) {
+    if (shape.isActive) {
+        if (!checkShapeHitsLeftWall(shape) && !checkShapeHitsLeftShape(shape)) {
+            shape.blocks.forEach(block => {
+                block.x = block.x - sizeBlocks;
+            });
+            shape.x = shape.x - sizeBlocks;
+        }
+    }
+}
+
+function moveRight(shape) {
+    if (shape.isActive) {
+        if (!checkShapeHitsRightWall(shape) && !checkShapeHitsRightShape(shape)) {
+            shape.blocks.forEach(block => {
+                block.x = block.x + sizeBlocks;
+            });
+            shape.x = shape.x + sizeBlocks;
+        }
+    }
+}
+
+function checkShapeHitsLeftWall(shape) {
+    for (let i = 0; i < shape.blocks.length; i++) {
+        const block = shape.blocks[i];
+        if (block.x - sizeBlocks <= 0) {
+            console.log('true');
+            return true;
+        }
+    }
+    return false;
+}
+
+
+function checkShapeHitsRightWall(shape) {
+    for (let i = 0; i < shape.blocks.length; i++) {
+        const block = shape.blocks[i];
+        if (block.x + sizeBlocks + sizeBlocks >= 500) {
+            console.log('true');
+            return true;
+        }
+    }
+    return false;
+}
+
+function checkShapeHitsLeftShape(shape) {
+    for (let i = 0; i < shape.blocks.length; i++) {
+        const block = shape.blocks[i];
+        for (let j = 0; j < blocksNotActive.length; j++) {
+            const blockNotActive = blocksNotActive[j];
+            if (block.x - sizeBlocks == blockNotActive.x && (block.y + sizeBlocks) >= blockNotActive.y && (block.y) <= blockNotActive.y + sizeBlocks) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+function checkShapeHitsRightShape(shape) {
+    for (let i = 0; i < shape.blocks.length; i++) {
+        const block = shape.blocks[i];
+        for (let j = 0; j < blocksNotActive.length; j++) {
+            const blockNotActive = blocksNotActive[j];
+            if (block.x + sizeBlocks == blockNotActive.x && (block.y + sizeBlocks) >= blockNotActive.y && (block.y) <= blockNotActive.y + sizeBlocks) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 function checkShapeTouchAnotherShape(shape) {
     for (let i = 0; i < shape.blocks.length; i++) {
         const block = shape.blocks[i];
         for (let j = 0; j < blocksNotActive.length; j++) {
             const blockNotActive = blocksNotActive[j];
-            if (block.x == blockNotActive.x && (block.y + sizeBlocks) > blockNotActive.y) {
+            if (block.x == blockNotActive.x && (block.y + sizeBlocks) >= blockNotActive.y && (block.y + sizeBlocks) <= blockNotActive.y + sizeBlocks) {
                 return false;
             }
         }
@@ -201,15 +307,15 @@ function checkShapeTouchAnotherShape(shape) {
 }
 
 function checkShapeTouchingGround(shape) {
-    if (shape.blocks[0].y + sizeBlocks + speed > 700) {
+    if (shape.blocks[0].y + sizeBlocks + sizeBlocks > 700) {
         return false;
-    } else if (shape.blocks[1].y + sizeBlocks + speed > 700) {
-        return false;
-    }
-    else if (shape.blocks[2].y + sizeBlocks + speed > 700) {
+    } else if (shape.blocks[1].y + sizeBlocks + sizeBlocks > 700) {
         return false;
     }
-    else if (shape.blocks[3].y + sizeBlocks + speed > 700) {
+    else if (shape.blocks[2].y + sizeBlocks + sizeBlocks > 700) {
+        return false;
+    }
+    else if (shape.blocks[3].y + sizeBlocks + sizeBlocks > 700) {
         return false;
     }
     else {
@@ -337,21 +443,19 @@ function rotateLShape(shape) {
 function rotateLine(shape) {
     console.log(shape);
     if (shape.rotation == 0) {
-        shape.blocks[0].y -= sizeBlocks * 1.5;
+        shape.blocks[0].y -= sizeBlocks * 1;
         shape.blocks[0].x -= sizeBlocks;
-        shape.blocks[1].y -= sizeBlocks * 0.5;
-        shape.blocks[2].y += sizeBlocks * 0.5;
+        shape.blocks[2].y += sizeBlocks * 1;
         shape.blocks[2].x += sizeBlocks;
-        shape.blocks[3].y += sizeBlocks * 1.5;
+        shape.blocks[3].y += sizeBlocks * 2;
         shape.blocks[3].x += sizeBlocks * 2;
     }
     else if (shape.rotation == 90) {
-        shape.blocks[0].y += sizeBlocks * 1.5;
+        shape.blocks[0].y += sizeBlocks * 1;
         shape.blocks[0].x += sizeBlocks;
-        shape.blocks[1].y += sizeBlocks * 0.5;
-        shape.blocks[2].y -= sizeBlocks * 0.5;
+        shape.blocks[2].y -= sizeBlocks * 1;
         shape.blocks[2].x -= sizeBlocks;
-        shape.blocks[3].y -= sizeBlocks * 1.5;
+        shape.blocks[3].y -= sizeBlocks * 2;
         shape.blocks[3].x -= sizeBlocks * 2;
     }
 
@@ -369,16 +473,28 @@ function clearCanvas() {
 function runGame() {
     activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     if (activeShape === null || activeShape === undefined) {
-        createLine();
+        createRandomShape();
         activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     }
     moveDown(activeShape);
     clearCanvas();
     drawBlocks();
-    requestAnimationFrame(runGame);
+    setTimeout(() => {
+        requestAnimationFrame(runGame);
+    }, speed);
 }
 
-createLine();
+function redraw() {
+    activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
+    if (activeShape === null || activeShape === undefined) {
+        createRandomShape();
+        activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
+    }
+    clearCanvas();
+    drawBlocks();
+}
+
+createRandomShape();
 drawBlocks();
 setConrols();
 requestAnimationFrame(runGame)
