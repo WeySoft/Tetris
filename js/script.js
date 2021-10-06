@@ -218,18 +218,20 @@ function checkShapeTouchingGround(shape) {
 }
 
 function rotateShape() {
-    var tempShape;
     shapes.forEach(shape => {
         if (shape.isActive) {
             switch (shape.shapeName) {
                 case 'tShape':
-                    tempShape = rotateTShape(shape);
+                    rotateTShape(shape);
                     break;
                 case 'zShape':
+                    rotateZShape(shape);
                     break;
                 case 'lShape':
+                    rotateLShape(shape);
                     break;
                 case 'line':
+                    rotateLine(shape);
                     break;
                 default:
                     break;
@@ -241,7 +243,7 @@ function rotateShape() {
 function rotateTShape(shape) {
     console.log(shape);
     if (shape.rotation == 0) {
-        shape.blocks[0].y += sizeBlocks*2;
+        shape.blocks[0].y += sizeBlocks * 2;
         shape.blocks[0].x -= sizeBlocks;
         shape.blocks[2].y += sizeBlocks;
     }
@@ -268,6 +270,97 @@ function rotateTShape(shape) {
     }
 }
 
+function rotateZShape(shape) {
+    console.log(shape);
+    if (shape.rotation == 0) {
+        shape.blocks[0].x += sizeBlocks * 2;
+        shape.blocks[0].y += sizeBlocks;
+        shape.blocks[1].x += sizeBlocks;
+        shape.blocks[2].y += sizeBlocks;
+        shape.blocks[3].x -= sizeBlocks;
+    }
+    else if (shape.rotation == 90) {
+        shape.blocks[0].x -= sizeBlocks * 2;
+        shape.blocks[0].y -= sizeBlocks;
+        shape.blocks[1].x -= sizeBlocks;
+        shape.blocks[2].y -= sizeBlocks;
+        shape.blocks[3].x += sizeBlocks;
+    }
+
+    shape.rotation = shape.rotation + 90;
+    if (shape.rotation > 90) {
+        shape.rotation = 0;
+    }
+}
+
+function rotateLShape(shape) {
+    console.log(shape);
+    if (shape.rotation == 0) {
+        shape.blocks[0].y += sizeBlocks;
+        shape.blocks[0].x += sizeBlocks * 2;
+        shape.blocks[1].x += sizeBlocks;
+        shape.blocks[2].y -= sizeBlocks;
+        shape.blocks[3].x -= sizeBlocks;
+    }
+    else if (shape.rotation == 90) {
+        shape.blocks[0].y += sizeBlocks;
+        shape.blocks[0].x -= sizeBlocks * 2;
+        shape.blocks[1].x -= sizeBlocks;
+        shape.blocks[2].y -= sizeBlocks;
+        shape.blocks[3].y -= sizeBlocks * 2;
+        shape.blocks[3].x -= sizeBlocks;
+
+    }
+
+    else if (shape.rotation == 180) {
+        shape.blocks[0].y -= sizeBlocks;
+        shape.blocks[0].x -= sizeBlocks;
+        shape.blocks[2].y += sizeBlocks;
+        shape.blocks[2].x += sizeBlocks;
+        shape.blocks[3].x += sizeBlocks * 2;
+    }
+
+    else if (shape.rotation == 270) {
+        shape.blocks[0].y -= sizeBlocks;
+        shape.blocks[0].x += sizeBlocks;
+        shape.blocks[2].y += sizeBlocks;
+        shape.blocks[2].x -= sizeBlocks;
+        shape.blocks[3].y += sizeBlocks * 2;
+    }
+    shape.rotation = shape.rotation + 90;
+    if (shape.rotation > 270) {
+        shape.rotation = 0;
+    }
+}
+
+
+function rotateLine(shape) {
+    console.log(shape);
+    if (shape.rotation == 0) {
+        shape.blocks[0].y -= sizeBlocks * 1.5;
+        shape.blocks[0].x -= sizeBlocks;
+        shape.blocks[1].y -= sizeBlocks * 0.5;
+        shape.blocks[2].y += sizeBlocks * 0.5;
+        shape.blocks[2].x += sizeBlocks;
+        shape.blocks[3].y += sizeBlocks * 1.5;
+        shape.blocks[3].x += sizeBlocks * 2;
+    }
+    else if (shape.rotation == 90) {
+        shape.blocks[0].y += sizeBlocks * 1.5;
+        shape.blocks[0].x += sizeBlocks;
+        shape.blocks[1].y += sizeBlocks * 0.5;
+        shape.blocks[2].y -= sizeBlocks * 0.5;
+        shape.blocks[2].x -= sizeBlocks;
+        shape.blocks[3].y -= sizeBlocks * 1.5;
+        shape.blocks[3].x -= sizeBlocks * 2;
+    }
+
+    shape.rotation = shape.rotation + 90;
+    if (shape.rotation > 90) {
+        shape.rotation = 0;
+    }
+}
+
 
 function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -276,7 +369,7 @@ function clearCanvas() {
 function runGame() {
     activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     if (activeShape === null || activeShape === undefined) {
-        createTShape();
+        createLine();
         activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     }
     moveDown(activeShape);
@@ -285,7 +378,7 @@ function runGame() {
     requestAnimationFrame(runGame);
 }
 
-createTShape();
+createLine();
 drawBlocks();
 setConrols();
 requestAnimationFrame(runGame)
