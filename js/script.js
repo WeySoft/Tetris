@@ -8,7 +8,7 @@ var points = 0;
 var shapes = [];
 var blocksNotActive = [];
 var shapeCounter = 0;
-
+var activeShape;
 
 function setConrols() {
     document.body.addEventListener('keydown', function (event) {
@@ -18,6 +18,7 @@ function setConrols() {
                 speed = 2;
                 break;
             case "ArrowUp":
+                rotateShape();
                 break;
         }
     });
@@ -107,7 +108,7 @@ function createLine() {
     // Under Left Block
     blocks.push(createBlock((canvas.width / 2) - sizeBlocks, 0, "#00ffff"));
     // Under Right Block
-    blocks.push(createBlock((canvas.width / 2) - sizeBlocks*2, 0, "#00ffff"));
+    blocks.push(createBlock((canvas.width / 2) - sizeBlocks * 2, 0, "#00ffff"));
 
     var line = {
         id: shapeCounter,
@@ -129,9 +130,9 @@ function createLShape() {
     // Upper Right Block
     blocks.push(createBlock((canvas.width / 2), sizeBlocks, "#ff0000"));
     // Under Left Block
-    blocks.push(createBlock((canvas.width / 2), sizeBlocks*2, "#ff0000"));
+    blocks.push(createBlock((canvas.width / 2), sizeBlocks * 2, "#ff0000"));
     // Under Right Block
-    blocks.push(createBlock((canvas.width / 2) + sizeBlocks, sizeBlocks*2, "#ff0000"));
+    blocks.push(createBlock((canvas.width / 2) + sizeBlocks, sizeBlocks * 2, "#ff0000"));
 
     var lShape = {
         id: shapeCounter,
@@ -155,7 +156,7 @@ function createZShape() {
     // Under Left Block
     blocks.push(createBlock((canvas.width / 2) + sizeBlocks, sizeBlocks, "#ff00ff"));
     // Under Right Block
-    blocks.push(createBlock((canvas.width / 2) + sizeBlocks, sizeBlocks*2, "#ff00ff"));
+    blocks.push(createBlock((canvas.width / 2) + sizeBlocks, sizeBlocks * 2, "#ff00ff"));
 
     var zShape = {
         id: shapeCounter,
@@ -235,44 +236,36 @@ function rotateShape() {
             }
         }
     })
-    shapes.map(obj => {
-        if (obj.id == tempShape.id) {
-            return tempShape
-        } else {
-            return obj;
-        }
-    });
 }
 
 function rotateTShape(shape) {
+    console.log(shape);
     if (shape.rotation == 0) {
-        shape.blocks.forEach((block, index) => {
-            if (index == 0) {
-                block.x -= sizeBlocks;
-                block.y += sizeBlocks*2;
-            }
-            else if (index == 2) {
-                block.y += sizeBlocks;
-            }
-        });
-        return shape;
+        shape.blocks[0].y += sizeBlocks*2;
+        shape.blocks[0].x -= sizeBlocks;
+        shape.blocks[2].y += sizeBlocks;
     }
     else if (shape.rotation == 90) {
 
+        shape.blocks[0].x += sizeBlocks;
+        shape.blocks[0].y -= sizeBlocks;
     }
 
     else if (shape.rotation == 180) {
-
+        shape.blocks[2].x += sizeBlocks;
+        shape.blocks[2].y += sizeBlocks;
     }
 
     else if (shape.rotation == 270) {
-
-    }
-
-    if (shape.rotation == 270) {
-        shape.rotation = 0;
+        shape.blocks[1].y += sizeBlocks;
+        shape.blocks[2].y -= sizeBlocks;
+        shape.blocks[2].x -= sizeBlocks;
+        shape.blocks[3].y += sizeBlocks;
     }
     shape.rotation = shape.rotation + 90;
+    if (shape.rotation > 270) {
+        shape.rotation = 0;
+    }
 }
 
 
@@ -281,10 +274,10 @@ function clearCanvas() {
 }
 
 function runGame() {
-    var activeShape = shapes.find(shape => shape.isActive === true);
+    activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     if (activeShape === null || activeShape === undefined) {
-        createLShape();
-        activeShape = shapes.find(shape => shape.isActive === true);
+        createTShape();
+        activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     }
     moveDown(activeShape);
     clearCanvas();
