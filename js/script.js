@@ -1,7 +1,8 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// Game 
+// Game
+const sizeBlocks = 25;
 var speed = 0.4;
 var points = 0;
 var shapes = [];
@@ -33,7 +34,7 @@ function setConrols() {
 function drawBlocks() {
     shapes.forEach(shape => shape.blocks.forEach((block) => {
         ctx.fillStyle = block.color;
-        ctx.fillRect(block.x, block.y, 50, 50)
+        ctx.fillRect(block.x, block.y, sizeBlocks, sizeBlocks)
     })
     )
 }
@@ -54,11 +55,11 @@ function createSqaure() {
     // Upper Left Block
     blocks.push(createBlock((canvas.width / 2), 0, "#00ff00"));
     // Upper Right Block
-    blocks.push(createBlock((canvas.width / 2) + 50, 0, "#00ff00"));
+    blocks.push(createBlock((canvas.width / 2) + sizeBlocks, 0, "#00ff00"));
     // Under Left Block
-    blocks.push(createBlock((canvas.width / 2), 50, "#00ff00"));
+    blocks.push(createBlock((canvas.width / 2), sizeBlocks, "#00ff00"));
     // Under Right Block
-    blocks.push(createBlock((canvas.width / 2) + 50, 50, "#00ff00"));
+    blocks.push(createBlock((canvas.width / 2) + sizeBlocks, sizeBlocks, "#00ff00"));
 
     var square = {
         id: shapeCounter,
@@ -76,13 +77,13 @@ function createTShape() {
     shapeCounter++;
     var blocks = [];
     // Upper Left Block
-    blocks.push(createBlock((canvas.width / 2) + 50, 0, "#ff7700"));
+    blocks.push(createBlock((canvas.width / 2) + sizeBlocks, 0, "#ff7700"));
     // Upper Right Block
     blocks.push(createBlock((canvas.width / 2), 0, "#ff7700"));
     // Under Left Block
-    blocks.push(createBlock((canvas.width / 2) - 50, 0, "#ff7700"));
+    blocks.push(createBlock((canvas.width / 2) - sizeBlocks, 0, "#ff7700"));
     // Under Right Block
-    blocks.push(createBlock((canvas.width / 2), 50, "#ff7700"));
+    blocks.push(createBlock((canvas.width / 2), sizeBlocks, "#ff7700"));
 
     var tShape = {
         id: shapeCounter,
@@ -100,13 +101,13 @@ function createLine() {
     shapeCounter++;
     var blocks = [];
     // Upper Left Block
-    blocks.push(createBlock((canvas.width / 2) + 50, 0, "#00ffff"));
+    blocks.push(createBlock((canvas.width / 2) + sizeBlocks, 0, "#00ffff"));
     // Upper Right Block
     blocks.push(createBlock((canvas.width / 2), 0, "#00ffff"));
     // Under Left Block
-    blocks.push(createBlock((canvas.width / 2) - 50, 0, "#00ffff"));
+    blocks.push(createBlock((canvas.width / 2) - sizeBlocks, 0, "#00ffff"));
     // Under Right Block
-    blocks.push(createBlock((canvas.width / 2) - 100, 0, "#00ffff"));
+    blocks.push(createBlock((canvas.width / 2) - sizeBlocks*2, 0, "#00ffff"));
 
     var line = {
         id: shapeCounter,
@@ -126,11 +127,11 @@ function createLShape() {
     // Upper Left Block
     blocks.push(createBlock((canvas.width / 2), 0, "#ff0000"));
     // Upper Right Block
-    blocks.push(createBlock((canvas.width / 2), 50, "#ff0000"));
+    blocks.push(createBlock((canvas.width / 2), sizeBlocks, "#ff0000"));
     // Under Left Block
-    blocks.push(createBlock((canvas.width / 2), 100, "#ff0000"));
+    blocks.push(createBlock((canvas.width / 2), sizeBlocks*2, "#ff0000"));
     // Under Right Block
-    blocks.push(createBlock((canvas.width / 2) + 50, 100, "#ff0000"));
+    blocks.push(createBlock((canvas.width / 2) + sizeBlocks, sizeBlocks*2, "#ff0000"));
 
     var lShape = {
         id: shapeCounter,
@@ -150,11 +151,11 @@ function createZShape() {
     // Upper Left Block
     blocks.push(createBlock((canvas.width / 2), 0, "#ff00ff"));
     // Upper Right Block
-    blocks.push(createBlock((canvas.width / 2), 50, "#ff00ff"));
+    blocks.push(createBlock((canvas.width / 2), sizeBlocks, "#ff00ff"));
     // Under Left Block
-    blocks.push(createBlock((canvas.width / 2) + 50, 50, "#ff00ff"));
+    blocks.push(createBlock((canvas.width / 2) + sizeBlocks, sizeBlocks, "#ff00ff"));
     // Under Right Block
-    blocks.push(createBlock((canvas.width / 2) + 50, 100, "#ff00ff"));
+    blocks.push(createBlock((canvas.width / 2) + sizeBlocks, sizeBlocks*2, "#ff00ff"));
 
     var zShape = {
         id: shapeCounter,
@@ -170,7 +171,7 @@ function createZShape() {
 
 function moveDown(shape) {
     if (shape.isActive) {
-        if (checkIfShapeIsNotTouchingGround(shape) && checkIfShapeIsNotTouchingAnotherShape(shape)) {
+        if (checkShapeTouchingGround(shape) && checkShapeTouchAnotherShape(shape)) {
             shape.blocks.forEach(block => {
                 block.y = block.y + speed;
             });
@@ -185,28 +186,29 @@ function moveDown(shape) {
     }
 }
 
-function checkIfShapeIsNotTouchingAnotherShape(shape) {
-    shape.blocks.forEach(block => {
-        blocksNotActive.forEach(blockNotActive => {
-            if (block.x == blockNotActive.x && (block.y + 50) > blockNotActive.y) {
-                console.log('flase');
+function checkShapeTouchAnotherShape(shape) {
+    for (let i = 0; i < shape.blocks.length; i++) {
+        const block = shape.blocks[i];
+        for (let j = 0; j < blocksNotActive.length; j++) {
+            const blockNotActive = blocksNotActive[j];
+            if (block.x == blockNotActive.x && (block.y + sizeBlocks) > blockNotActive.y) {
                 return false;
             }
-        })
-    });
+        }
+    }
     return true;
 }
 
-function checkIfShapeIsNotTouchingGround(shape) {
-    if (shape.blocks[0].y + 50 + speed > 700) {
+function checkShapeTouchingGround(shape) {
+    if (shape.blocks[0].y + sizeBlocks + speed > 700) {
         return false;
-    } else if (shape.blocks[1].y + 50 + speed > 700) {
-        return false;
-    }
-    else if (shape.blocks[2].y + 50 + speed > 700) {
+    } else if (shape.blocks[1].y + sizeBlocks + speed > 700) {
         return false;
     }
-    else if (shape.blocks[3].y + 50 + speed > 700) {
+    else if (shape.blocks[2].y + sizeBlocks + speed > 700) {
+        return false;
+    }
+    else if (shape.blocks[3].y + sizeBlocks + speed > 700) {
         return false;
     }
     else {
@@ -246,11 +248,11 @@ function rotateTShape(shape) {
     if (shape.rotation == 0) {
         shape.blocks.forEach((block, index) => {
             if (index == 0) {
-                block.x -= 50;
-                block.y += 100;
+                block.x -= sizeBlocks;
+                block.y += sizeBlocks*2;
             }
             else if (index == 2) {
-                block.y += 50;
+                block.y += sizeBlocks;
             }
         });
         return shape;
