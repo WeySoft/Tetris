@@ -339,7 +339,6 @@ function checkFullLine() {
 
 function delteBlocksInLine(blocksInLine, line) {
     let blockInLine;
-    console.log(shapes);
     for (let i = 0; i < blocksInLine.length; i++) {
         blockInLine = blocksInLine[i];
         for (let j = 0; j < blocks.length; j++) {
@@ -375,7 +374,9 @@ function delteBlocksInLine(blocksInLine, line) {
 function moveBlocksAboveLineDown(line) {
     for (let i = 0; i < blocksNotActive.length; i++) {
         const block = blocksNotActive[i];
-        if (block.y > line) {
+        console.log(block.y,line);
+        if (block.y < line) {
+            console.log("why")
             block.y += 25;
         }
     }
