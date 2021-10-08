@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,22 +8,27 @@
     <link rel="stylesheet" href="./css/style.css">
     <title>Nik's Tetris</title>
 </head>
+
 <body>
     <div class="container">
         <h1>Welcome to Tetris</h1>
-        <div class="gameBox">
-            <canvas id="gameCanvas" height="700" width="500">
-
-            </canvas>
-        </div>
-        <div class="rules">
-            <h1>Controls:</h1>
-            <p>Use your up arrowkey to Rotate the block</p>
-            <p>Use your right or left arrowkey to move the block right or left</p>
-            <p>Use your down arrowkey to move the block down faster</p>
+        <div class="flexbox">
+            <div class="score">
+                <h1>Score</h1>
+                <spand id="score"></spand>
+                <h1>Controls:</h1>
+                <p>Use your up arrowkey to Rotate the block</p>
+                <p>Use your right or left arrowkey to move the block right or left</p>
+                <p>Use your down arrowkey to move the block down faster</p>
+            </div>
+            <div class="gameBox container">
+                <canvas id="gameCanvas" height="600" width="500">
+                </canvas>
+            </div>
         </div>
     </div>
 
     <script src="./js/script.js"></script>
 </body>
+
 </html>

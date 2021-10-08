@@ -1,21 +1,22 @@
 const canvas = document.getElementById("gameCanvas");
+const scoreSpan = document.getElementById("score");
 const ctx = canvas.getContext("2d");
 
 // Game
-const sizeBlocks = 25;
-var speed = 1000;
-var points = 0;
-var shapes = [];
-var blocksNotActive = [];
-var shapeCounter = 0;
-var activeShape;
+const sizeBlocks = canvas.width / 20;
+let speed = 1000;
+let score = 0;
+let shapes = [];
+let blocksNotActive = [];
+let shapeCounter = 0;
+let activeShape;
 
 function setConrols() {
     document.body.addEventListener('keydown', function (event) {
         const key = event.key;
         switch (key) {
             case "ArrowDown":
-                speed = 250;
+                speed = 125;
                 break;
             case "ArrowUp":
                 rotateShape();
@@ -54,7 +55,7 @@ function getRandomArbitrary(min, max) {
 }
 
 function createRandomShape() {
-    var rndInt = getRandomArbitrary(1, 6);
+    let rndInt = getRandomArbitrary(1, 6);
     switch (rndInt) {
         case 1:
             createSqaure();
@@ -70,6 +71,7 @@ function createRandomShape() {
             break;
         case 5:
             createZShape();
+            break;
         default:
             createRandomShape();
             break;
@@ -77,7 +79,7 @@ function createRandomShape() {
 }
 
 function createBlock(x, y, color) {
-    var block = {
+    let block = {
         x,
         y,
         color,
@@ -88,7 +90,7 @@ function createBlock(x, y, color) {
 
 function createSqaure() {
     shapeCounter++;
-    var blocks = [];
+    let blocks = [];
     // Upper Left Block
     blocks.push(createBlock((canvas.width / 2), 0, "#00ff00"));
     // Upper Right Block
@@ -98,7 +100,7 @@ function createSqaure() {
     // Under Right Block
     blocks.push(createBlock((canvas.width / 2) + sizeBlocks, sizeBlocks, "#00ff00"));
 
-    var square = {
+    let square = {
         id: shapeCounter,
         shapeName: "square",
         x: (canvas.width / 2),
@@ -112,7 +114,7 @@ function createSqaure() {
 
 function createTShape() {
     shapeCounter++;
-    var blocks = [];
+    let blocks = [];
     // Upper Left Block
     blocks.push(createBlock((canvas.width / 2) + sizeBlocks, 0, "#ff7700"));
     // Upper Right Block
@@ -122,7 +124,7 @@ function createTShape() {
     // Under Right Block
     blocks.push(createBlock((canvas.width / 2), sizeBlocks, "#ff7700"));
 
-    var tShape = {
+    let tShape = {
         id: shapeCounter,
         shapeName: "tShape",
         x: (canvas.width / 2),
@@ -136,7 +138,7 @@ function createTShape() {
 
 function createLine() {
     shapeCounter++;
-    var blocks = [];
+    let blocks = [];
     // Upper Left Block
     blocks.push(createBlock((canvas.width / 2) + sizeBlocks, 0, "#00ffff"));
     // Upper Right Block
@@ -146,7 +148,7 @@ function createLine() {
     // Under Right Block
     blocks.push(createBlock((canvas.width / 2) - sizeBlocks * 2, 0, "#00ffff"));
 
-    var line = {
+    let line = {
         id: shapeCounter,
         shapeName: "line",
         x: (canvas.width / 2),
@@ -160,7 +162,7 @@ function createLine() {
 
 function createLShape() {
     shapeCounter++;
-    var blocks = [];
+    let blocks = [];
     // Upper Left Block
     blocks.push(createBlock((canvas.width / 2), 0, "#ff0000"));
     // Upper Right Block
@@ -170,7 +172,7 @@ function createLShape() {
     // Under Right Block
     blocks.push(createBlock((canvas.width / 2) + sizeBlocks, sizeBlocks * 2, "#ff0000"));
 
-    var lShape = {
+    let lShape = {
         id: shapeCounter,
         shapeName: "lShape",
         x: (canvas.width / 2),
@@ -184,7 +186,7 @@ function createLShape() {
 
 function createZShape() {
     shapeCounter++;
-    var blocks = [];
+    let blocks = [];
     // Upper Left Block
     blocks.push(createBlock((canvas.width / 2), 0, "#ff00ff"));
     // Upper Right Block
@@ -194,7 +196,7 @@ function createZShape() {
     // Under Right Block
     blocks.push(createBlock((canvas.width / 2) + sizeBlocks, sizeBlocks * 2, "#ff00ff"));
 
-    var zShape = {
+    let zShape = {
         id: shapeCounter,
         shapeName: "zShape",
         x: (canvas.width / 2),
@@ -218,7 +220,8 @@ function moveDown(shape) {
                 blocksNotActive.push(block);
             });
             shape.isActive = false;
-            console.log(shape);
+            setScore();
+            createRandomShape();
         }
     }
 }
@@ -249,7 +252,6 @@ function checkShapeHitsLeftWall(shape) {
     for (let i = 0; i < shape.blocks.length; i++) {
         const block = shape.blocks[i];
         if (block.x - sizeBlocks <= 0) {
-            console.log('true');
             return true;
         }
     }
@@ -261,7 +263,6 @@ function checkShapeHitsRightWall(shape) {
     for (let i = 0; i < shape.blocks.length; i++) {
         const block = shape.blocks[i];
         if (block.x + sizeBlocks + sizeBlocks >= 500) {
-            console.log('true');
             return true;
         }
     }
@@ -307,15 +308,15 @@ function checkShapeTouchAnotherShape(shape) {
 }
 
 function checkShapeTouchingGround(shape) {
-    if (shape.blocks[0].y + sizeBlocks + sizeBlocks > 700) {
+    if (shape.blocks[0].y + sizeBlocks + sizeBlocks > canvas.height) {
         return false;
-    } else if (shape.blocks[1].y + sizeBlocks + sizeBlocks > 700) {
-        return false;
-    }
-    else if (shape.blocks[2].y + sizeBlocks + sizeBlocks > 700) {
+    } else if (shape.blocks[1].y + sizeBlocks + sizeBlocks > canvas.height) {
         return false;
     }
-    else if (shape.blocks[3].y + sizeBlocks + sizeBlocks > 700) {
+    else if (shape.blocks[2].y + sizeBlocks + sizeBlocks > canvas.height) {
+        return false;
+    }
+    else if (shape.blocks[3].y + sizeBlocks + sizeBlocks > canvas.height) {
         return false;
     }
     else {
@@ -347,7 +348,6 @@ function rotateShape() {
 }
 
 function rotateTShape(shape) {
-    console.log(shape);
     if (shape.rotation == 0) {
         shape.blocks[0].y += sizeBlocks * 2;
         shape.blocks[0].x -= sizeBlocks;
@@ -377,7 +377,6 @@ function rotateTShape(shape) {
 }
 
 function rotateZShape(shape) {
-    console.log(shape);
     if (shape.rotation == 0) {
         shape.blocks[0].x += sizeBlocks * 2;
         shape.blocks[0].y += sizeBlocks;
@@ -400,7 +399,6 @@ function rotateZShape(shape) {
 }
 
 function rotateLShape(shape) {
-    console.log(shape);
     if (shape.rotation == 0) {
         shape.blocks[0].y += sizeBlocks;
         shape.blocks[0].x += sizeBlocks * 2;
@@ -441,7 +439,6 @@ function rotateLShape(shape) {
 
 
 function rotateLine(shape) {
-    console.log(shape);
     if (shape.rotation == 0) {
         shape.blocks[0].y -= sizeBlocks * 1;
         shape.blocks[0].x -= sizeBlocks;
@@ -470,6 +467,28 @@ function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 }
 
+function drawRaster() {
+    for (let i = 0; i < canvas.width; i += sizeBlocks) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, canvas.height);
+        ctx.stroke();
+    }
+    for (let i = 0; i < canvas.height; i += sizeBlocks) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(canvas.width, i);
+        ctx.stroke();
+    }
+}
+
+function setScore() {
+
+    score += 42;
+    console.log(score);
+    scoreSpan.innerHTML = score;
+}
+
 function runGame() {
     activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     if (activeShape === null || activeShape === undefined) {
@@ -479,6 +498,7 @@ function runGame() {
     moveDown(activeShape);
     clearCanvas();
     drawBlocks();
+    drawRaster();
     setTimeout(() => {
         requestAnimationFrame(runGame);
     }, speed);
@@ -492,9 +512,8 @@ function redraw() {
     }
     clearCanvas();
     drawBlocks();
+    drawRaster();
 }
 
-createRandomShape();
-drawBlocks();
 setConrols();
 requestAnimationFrame(runGame)
