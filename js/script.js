@@ -374,12 +374,11 @@ function delteBlocksInLine(blocksInLine, line) {
 function moveBlocksAboveLineDown(line) {
     for (let i = 0; i < blocksNotActive.length; i++) {
         const block = blocksNotActive[i];
-        console.log(block.y,line);
         if (block.y < line) {
-            console.log("why")
             block.y += 25;
         }
     }
+    setScore();
 }
 
 function checkGameOver() {
@@ -561,10 +560,23 @@ function setScore() {
     scoreSpan.innerHTML = score;
 }
 
+function restartgame() {
+    speed = 1000;
+    score = 0;
+    blocks = [];
+    shapes = [];
+    blocksNotActive = [];
+    shapeCounter = 0;
+    activeShape = undefined;
+    scoreSpan.innerHTML = score;
+    requestAnimationFrame(runGame);
+}
+
 function runGame() {
     activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     if (activeShape === null || activeShape === undefined) {
-        createLine();
+        createRandomShape();
+        speed -= 5;
         activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     }
     if (!checkGameOver()) {
@@ -586,7 +598,8 @@ function runGame() {
 function redraw() {
     activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     if (activeShape === null || activeShape === undefined) {
-        createLine();
+        createRandomShape();
+        speed -= 5;
         activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     }
     clearCanvas();
@@ -595,4 +608,5 @@ function redraw() {
 }
 
 setConrols();
+scoreSpan.innerHTML = score;
 requestAnimationFrame(runGame);
