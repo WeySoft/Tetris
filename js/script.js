@@ -164,13 +164,13 @@ function createLShape() {
     shapeCounter++;
     let blocks = [];
     // Upper Left Block
-    blocks.push(createBlock((canvas.width / 2), 0, "#ff0000"));
+    blocks.push(createBlock((canvas.width / 2) - sizeBlocks, 0, "#ff0000"));
     // Upper Right Block
-    blocks.push(createBlock((canvas.width / 2), sizeBlocks, "#ff0000"));
+    blocks.push(createBlock((canvas.width / 2) - sizeBlocks, sizeBlocks, "#ff0000"));
     // Under Left Block
-    blocks.push(createBlock((canvas.width / 2), sizeBlocks * 2, "#ff0000"));
+    blocks.push(createBlock((canvas.width / 2) - sizeBlocks, sizeBlocks * 2, "#ff0000"));
     // Under Right Block
-    blocks.push(createBlock((canvas.width / 2) + sizeBlocks, sizeBlocks * 2, "#ff0000"));
+    blocks.push(createBlock((canvas.width / 2), sizeBlocks * 2, "#ff0000"));
 
     let lShape = {
         id: shapeCounter,
@@ -188,13 +188,13 @@ function createZShape() {
     shapeCounter++;
     let blocks = [];
     // Upper Left Block
-    blocks.push(createBlock((canvas.width / 2), 0, "#ff00ff"));
+    blocks.push(createBlock((canvas.width / 2) - sizeBlocks, 0, "#ff00ff"));
     // Upper Right Block
-    blocks.push(createBlock((canvas.width / 2), sizeBlocks, "#ff00ff"));
+    blocks.push(createBlock((canvas.width / 2) - sizeBlocks, sizeBlocks, "#ff00ff"));
     // Under Left Block
-    blocks.push(createBlock((canvas.width / 2) + sizeBlocks, sizeBlocks, "#ff00ff"));
+    blocks.push(createBlock((canvas.width / 2), sizeBlocks, "#ff00ff"));
     // Under Right Block
-    blocks.push(createBlock((canvas.width / 2) + sizeBlocks, sizeBlocks * 2, "#ff00ff"));
+    blocks.push(createBlock((canvas.width / 2), sizeBlocks * 2, "#ff00ff"));
 
     let zShape = {
         id: shapeCounter,
@@ -251,7 +251,7 @@ function moveRight(shape) {
 function checkShapeHitsLeftWall(shape) {
     for (let i = 0; i < shape.blocks.length; i++) {
         const block = shape.blocks[i];
-        if (block.x - sizeBlocks <= 0) {
+        if (block.x - sizeBlocks < 0) {
             return true;
         }
     }
@@ -262,7 +262,7 @@ function checkShapeHitsLeftWall(shape) {
 function checkShapeHitsRightWall(shape) {
     for (let i = 0; i < shape.blocks.length; i++) {
         const block = shape.blocks[i];
-        if (block.x + sizeBlocks + sizeBlocks >= 500) {
+        if (block.x + sizeBlocks >= 500) {
             return true;
         }
     }
@@ -322,6 +322,22 @@ function checkShapeTouchingGround(shape) {
     else {
         return true;
     }
+}
+
+function checkGameOver() {
+    for (let i = 0; i < blocksNotActive.length; i++) {
+        const blockNotActive = blocksNotActive[i];
+        if (blockNotActive.y === 0) {
+            return true;
+        }
+        for (let j = 0; j < activeShape.blocks.length; j++) {
+            const activeBlock = activeShape.blocks[j];
+            if (activeBlock.x === blockNotActive.x && activeBlock.y === blockNotActive.y) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 function rotateShape() {
@@ -483,9 +499,7 @@ function drawRaster() {
 }
 
 function setScore() {
-
-    score += 42;
-    console.log(score);
+    score += getRandomArbitrary(25, 43);;
     scoreSpan.innerHTML = score;
 }
 
@@ -495,15 +509,21 @@ function runGame() {
         createRandomShape();
         activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     }
-    moveDown(activeShape);
-    clearCanvas();
-    drawBlocks();
-    drawRaster();
-    setTimeout(() => {
-        requestAnimationFrame(runGame);
-    }, speed);
+    if (!checkGameOver()) {
+        moveDown(activeShape);
+        clearCanvas();
+        drawBlocks();
+        drawRaster();
+        setTimeout(() => {
+            requestAnimationFrame(runGame);
+        }, speed);
+    } else {
+        let restart = confirm("GameOver :( Do you want to restart the Game");
+        if (restart) {
+            restartgame();
+        }
+    }
 }
-
 function redraw() {
     activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     if (activeShape === null || activeShape === undefined) {
@@ -516,4 +536,4 @@ function redraw() {
 }
 
 setConrols();
-requestAnimationFrame(runGame)
+requestAnimationFrame(runGame);
