@@ -375,8 +375,8 @@ function delteBlocksInLine(blocksInLine, line) {
 function moveBlocksAboveLineDown(line) {
     for (let i = 0; i < blocksNotActive.length; i++) {
         const block = blocksNotActive[i];
-        if (block.y < line) {
-            block.y += sizeBlocks;
+        if (block.y > line) {
+            block.y += 25;
         }
     }
 }
