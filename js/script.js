@@ -6,6 +6,7 @@ const ctx = canvas.getContext("2d");
 const sizeBlocks = canvas.width / 20;
 let speed = 1000;
 let score = 0;
+let blocks = [];
 let shapes = [];
 let blocksNotActive = [];
 let shapeCounter = 0;
@@ -43,11 +44,10 @@ function setConrols() {
 }
 
 function drawBlocks() {
-    shapes.forEach(shape => shape.blocks.forEach((block) => {
+    blocks.forEach((block) => {
         ctx.fillStyle = block.color;
         ctx.fillRect(block.x, block.y, sizeBlocks, sizeBlocks)
     })
-    )
 }
 
 function getRandomArbitrary(min, max) {
@@ -85,6 +85,7 @@ function createBlock(x, y, color) {
         color,
         isActive: true
     }
+    blocks.push(block)
     return block
 }
 
@@ -216,12 +217,14 @@ function moveDown(shape) {
             });
             shape.y = shape.y + sizeBlocks;
         } else {
+
             shape.blocks.forEach(block => {
+                block.isActive = false;
                 blocksNotActive.push(block);
             });
             shape.isActive = false;
             setScore();
-            createRandomShape();
+            // createRandomShape();
         }
     }
 }
@@ -321,6 +324,60 @@ function checkShapeTouchingGround(shape) {
     }
     else {
         return true;
+    }
+}
+
+function checkFullLine() {
+    let blocksInLine;
+    for (let i = 25; i < canvas.height; i += 25) {
+        blocksInLine = blocksNotActive.filter(block => block.y === i);
+        if (blocksInLine.length === 20) {
+            delteBlocksInLine(blocksInLine, i);
+        }
+    }
+}
+
+function delteBlocksInLine(blocksInLine, line) {
+    let blockInLine;
+    console.log(shapes);
+    for (let i = 0; i < blocksInLine.length; i++) {
+        blockInLine = blocksInLine[i];
+        for (let j = 0; j < blocks.length; j++) {
+            const block = blocks[j];
+            if (block.x === blockInLine.x && block.y === blockInLine.y) {
+                blocks.splice(j, 1);
+            }
+        }
+
+        for (let j = 0; j < blocksNotActive.length; j++) {
+            const notActiveBlock = blocksNotActive[j];
+            if (notActiveBlock.x === blockInLine.x && notActiveBlock.y === blockInLine.y) {
+                blocksNotActive.splice(j, 1);
+            }
+        }
+
+        for (let j = 0; j < shapes.length; j++) {
+            const shape = shapes[j];
+            for (let n = 0; n < shape.blocks; n++) {
+                const shapeBlock = shape.blocks;
+                if (shapeBlock.x === blockInLine.x && shapeBlock.y === blockInLine.y) {
+                    shape.blocks.splice((n), 1);
+                }
+            }
+            if (shape.blocks.length === 0) {
+                shapes.splice(shapes.findIndex(shapeFull => shapeFull.id === shape.id), 1);
+            }
+        }
+    }
+    moveBlocksAboveLineDown(line);
+}
+
+function moveBlocksAboveLineDown(line) {
+    for (let i = 0; i < blocksNotActive.length; i++) {
+        const block = blocksNotActive[i];
+        if (block.y < line) {
+            block.y += sizeBlocks;
+        }
     }
 }
 
@@ -506,11 +563,12 @@ function setScore() {
 function runGame() {
     activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     if (activeShape === null || activeShape === undefined) {
-        createRandomShape();
+        createLine();
         activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     }
     if (!checkGameOver()) {
         moveDown(activeShape);
+        checkFullLine();
         clearCanvas();
         drawBlocks();
         drawRaster();
@@ -527,7 +585,7 @@ function runGame() {
 function redraw() {
     activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     if (activeShape === null || activeShape === undefined) {
-        createRandomShape();
+        createLine();
         activeShape = shapes[shapes.findIndex(shape => shape.isActive === true)];
     }
     clearCanvas();
